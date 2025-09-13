@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Burundi Bwacu</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="box">
+    <h2>Connaitre le Burundi</h2>
+    <select id="province">
+      <option value="">-- Choix d'une Province --</option>
+    </select>
+    <select id="commune" style="display:none"></select>
+    <select id="colline" style="display:none"></select>
+    <p id="resultat"></p>
+  </div>
+
+  <script>
+    const province = document.getElementById("province"),
+          commune  = document.getElementById("commune"),
+          colline  = document.getElementById("colline"),
+          resultat = document.getElementById("resultat");
+
+    // Charger provinces
+    fetch("api.php?type=provinces").then(r=>r.json()).then(data=>{
+      data.forEach(p=>{
+        let o=document.createElement("option");
+        o.value=p.id; o.text=p.nom;
+        province.add(o);
+      });
+    });
+
+    // Province choisie -> communes
+    province.onchange=()=>{
+      commune.style.display="inline";
+      commune.innerHTML="";
+      colline.style.display="none";
+      resultat.textContent="";
+      if (!province.value) return;
+
+      fetch("api.php?type=communes&province_id="+province.value)
+        .then(r=>r.json()).then(data=>{
+          commune.add(new Option("-- Commune --",""));
+          data.forEach(c=>{
+            commune.add(new Option(c.nom, c.id));
+          });
+        });
+    };
+
+    // Commune choisie -> collines
+    commune.onchange=()=>{
+      colline.style.display="inline";
+      colline.innerHTML="";
+      resultat.textContent="";
+      if (!commune.value) return;
+
+      fetch("api.php?type=collines&commune_id="+commune.value)
+        .then(r=>r.json()).then(data=>{
+          colline.add(new Option("-- Colline --",""));
+          data.forEach(c=>{
+            colline.add(new Option(c.nom, c.id));
+          });
+        });
+    };
+
+    // Colline choisie -> afficher message
+    colline.onchange=()=>{
+      if (!colline.value) return;
+      const prov = province.options[province.selectedIndex].text;
+      const com  = commune.options[commune.selectedIndex].text;
+      const col  = colline.options[colline.selectedIndex].text;
+      resultat.textContent=`Vous avez choisi : ${prov} - ${com} - ${col}`;
+    };
+  </script>
+</body>
+</html>
