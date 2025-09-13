@@ -41,7 +41,7 @@
 
       fetch("api.php?type=communes&province_id="+province.value)
         .then(r=>r.json()).then(data=>{
-          commune.add(new Option("-- Commune --",""));
+          commune.add(new Option("-- Choix d'une Commune --",""));
           data.forEach(c=>{
             commune.add(new Option(c.nom, c.id));
           });
@@ -57,7 +57,7 @@
 
       fetch("api.php?type=collines&commune_id="+commune.value)
         .then(r=>r.json()).then(data=>{
-          colline.add(new Option("-- Colline --",""));
+          colline.add(new Option("-- Choix d'une Colline --",""));
           data.forEach(c=>{
             colline.add(new Option(c.nom, c.id));
           });
@@ -71,6 +71,7 @@
       const com  = commune.options[commune.selectedIndex].text;
       const col  = colline.options[colline.selectedIndex].text;
       resultat.textContent=`Vous avez choisi : ${prov} - ${com} - ${col}`;
+      resultat.style.color = "green";
     };
   </script>
 </body>
