@@ -6,31 +6,58 @@ body {
   align-items: center;
   font-family: Arial, sans-serif;
   /* Rouge 10% (en haut à droite), Blanc 80%, Vert 10% (en bas à gauche) en diagonale */
-  background: linear-gradient(135deg, red 15%, white 15% 85%, green 85%);
+  background: linear-gradient(135deg, 
+                              red 10%, 
+                              white 10% 90%, 
+                              green 90%);
 }
 
 .box {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  background: rgba(255,255,255,0.9);
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
   text-align: center;
-}
-
-h2 {
-  color: #333;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 select {
-  margin: 10px;
+  display: block;
+  margin: 10px auto;
   padding: 8px;
   font-size: 14px;
-  border-radius: 6px;
+  width: 220px;
+  border-radius: 5px;
   border: 1px solid #ccc;
 }
 
 #resultat {
-  margin-top: 20px;
   font-weight: bold;
+  margin-top: 15px;
   color: green;
+}
+
+/* Bouton Réinitialiser */
+#resetBtn {
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  background-color: green;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+#resetBtn:hover {
+  background-color: darkgreen;
+}
+
+/* Animation fade-in */
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+.fade-in.show {
+  opacity: 1;
 }

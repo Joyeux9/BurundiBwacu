@@ -8,70 +8,127 @@
 <body>
   <div class="box">
     <h2>Connaitre le Burundi</h2>
+
+    <!-- Combobox verticales -->
     <select id="province">
       <option value="">-- Choix d'une Province --</option>
     </select>
     <select id="commune" style="display:none"></select>
     <select id="colline" style="display:none"></select>
-    <p id="resultat"></p>
+
+    <!-- Message résultat -->
+    <p id="resultat" class="fade-in"></p>
+
+    <!-- Bouton Réinitialiser -->
+    <button id="resetBtn" class="fade-in" style="display:none">Réinitialiser</button>
   </div>
 
   <script>
     const province = document.getElementById("province"),
           commune  = document.getElementById("commune"),
           colline  = document.getElementById("colline"),
-          resultat = document.getElementById("resultat");
+          resultat = document.getElementById("resultat"),
+          resetBtn = document.getElementById("resetBtn");
+
+    // Exemple de données locales (à remplacer par API si besoin)
+    const data = {
+      bujumbura: { Ntahangwa: ["Buterere","Kinama"], Mukaza: ["Rohero","Nyakabiga"] },
+      gitega: { Gitega: ["Magarama","Shatanya"], Itaba: ["Gisuru","Muremera"] }
+    };
 
     // Charger provinces
-    fetch("api.php?type=provinces").then(r=>r.json()).then(data=>{
-      data.forEach(p=>{
-        let o=document.createElement("option");
-        o.value=p.id; o.text=p.nom;
-        province.add(o);
-      });
-    });
+    for (let prov in data) {
+      let o = document.createElement("option");
+      o.value = prov;
+      o.text = prov.charAt(0).toUpperCase() + prov.slice(1);
+      province.add(o);
+    }
 
     // Province choisie -> communes
-    province.onchange=()=>{
-      commune.style.display="inline";
-      commune.innerHTML="";
-      colline.style.display="none";
-      resultat.textContent="";
-      if (!province.value) return;
+    province.onchange = () => {
+      commune.innerHTML = "";
+      colline.innerHTML = "";
+      resultat.textContent = "";
+      resetBtn.style.display = "none";
+      resetBtn.classList.remove("show");
 
-      fetch("api.php?type=communes&province_id="+province.value)
-        .then(r=>r.json()).then(data=>{
-          commune.add(new Option("-- Choix d'une Commune --",""));
-          data.forEach(c=>{
-            commune.add(new Option(c.nom, c.id));
-          });
-        });
+      if (!province.value) {
+        commune.style.display = "none";
+        colline.style.display = "none";
+        return;
+      }
+
+      commune.style.display = "block";
+      colline.style.display = "none";
+
+      const communes = Object.keys(data[province.value]);
+      commune.innerHTML = '<option value="">-- Choix d\'une Commune --</option>';
+      communes.forEach(c => {
+        let opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        commune.appendChild(opt);
+      });
     };
 
     // Commune choisie -> collines
-    commune.onchange=()=>{
-      colline.style.display="inline";
-      colline.innerHTML="";
-      resultat.textContent="";
-      if (!commune.value) return;
+    commune.onchange = () => {
+      colline.innerHTML = "";
+      resultat.textContent = "";
+      resetBtn.style.display = "none";
+      resetBtn.classList.remove("show");
 
-      fetch("api.php?type=collines&commune_id="+commune.value)
-        .then(r=>r.json()).then(data=>{
-          colline.add(new Option("-- Choix d'une Colline --",""));
-          data.forEach(c=>{
-            colline.add(new Option(c.nom, c.id));
-          });
-        });
+      if (!commune.value) {
+        colline.style.display = "none";
+        return;
+      }
+
+      colline.style.display = "block";
+      const collines = data[province.value][commune.value];
+      colline.innerHTML = '<option value="">-- Choix d\'une Colline --</option>';
+      collines.forEach(c => {
+        let opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        colline.appendChild(opt);
+      });
     };
 
-    // Colline choisie -> afficher message
-    colline.onchange=()=>{
+    // Colline choisie -> afficher message et cacher communes+collines
+    colline.onchange = () => {
       if (!colline.value) return;
+
       const prov = province.options[province.selectedIndex].text;
       const com  = commune.options[commune.selectedIndex].text;
       const col  = colline.options[colline.selectedIndex].text;
-      resultat.textContent=`Vous avez choisi : ${prov} - ${com} - ${col}`;
-      resultat.style.color = "green";
+
+      resultat.textContent = `Vous avez choisi : ${prov} - ${com} - ${col}`;
+      resultat.style.display = "block";
+      setTimeout(() => resultat.classList.add("show"), 50);
+
+      commune.style.display = "none";
+      colline.style.display = "none";
+
+      resetBtn.style.display = "inline-block";
+      setTimeout(() => resetBtn.classList.add("show"), 50);
+    };
+
+    // Réinitialiser la sélection
+    resetBtn.onclick = () => {
+      province.value = "";
+      commune.innerHTML = "";
+      colline.innerHTML = "";
+
+      commune.style.display = "none";
+      colline.style.display = "none";
+
+      resultat.classList.remove("show");
+      resetBtn.classList.remove("show");
+      setTimeout(() => {
+        resultat.style.display = "none";
+        resetBtn.style.display = "none";
+        resultat.textContent = "";
+      }, 300);
     };
   </script>
 </body>
